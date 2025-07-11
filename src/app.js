@@ -1,5 +1,6 @@
 const express= require("express");
-const app =express();
+const app = express();
+const { adminauth, userauth } = require("./middlewares/auth");
 
 
 // app.get("/test",(req,res)=>{
@@ -37,6 +38,7 @@ const app =express();
 // one route can have multiple route handler
 // it has a third paramter called next which is called inside the first route handler and then 2nd one will response
 // but this undesirable
+// this is basically known as chain of middleware(handler) until the actual handler is not met
 app.use("/bye",(req,res,next)=>{
     console.log("1st post request here")
     next();
