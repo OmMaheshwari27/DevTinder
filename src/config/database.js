@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
-require("dotenv").config();
+const mongoose = require("mongoose");
+require("dotenv").config({ path: __dirname + "/../../.env" }); // 
 
 const connectDB = async () => {
-    return await mongoose.connect(process.env.MONGO_URI);
+  // console.log("✅ ENV Check:", process.env.MONGO_URI); // 🧪 Debug line
+  return await mongoose.connect(process.env.MONGO_URI);
 };
 
 module.exports = connectDB;
