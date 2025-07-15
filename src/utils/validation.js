@@ -1,5 +1,6 @@
 const validator = require("validator");
-const { default: isEmail } = require("validator/lib/isEmail");
+const bcrypt = require("bcrypt");
+
 
 const validateEmailOnly=(email)=>{
 if(!validator.isEmail(email)){
@@ -21,5 +22,17 @@ const validateUserSignup = (req) => {
     throw new Error("Password is too weak");
   }
 };
+const validateProfileData = (req) => {
+  const allowedEdit=["firstName","lastName","contactInfo","gender","age"];
+  const isEditAllowed=Object.keys(req.body).every(field=>allowedEdit.includes(field));
+  return isEditAllowed;
+};
 
-module.exports = {validateUserSignup, validateEmailOnly};
+const validatePassword = async (req) => {
+  const { password,new_password } = req.body; 
+  console.log(new_password);
+  
+  return await bcrypt.compare(password, req.user.password);
+};
+
+module.exports = {validateUserSignup, validateEmailOnly,validateProfileData ,validatePassword};

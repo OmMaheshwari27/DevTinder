@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { validateUserSignup, validateEmailOnly} = require("../utils/validation");
 const User = require("../models/user");
-const { Auth } = require("../middlewares/auth");
+//const { Auth } = require("../middlewares/auth");
 
 
 
@@ -67,6 +67,17 @@ AuthRouter.post("/login", async (request, response) => {
     else{
       throw new Error("Invalid Credentials\n");
     }
+  }
+  catch (err) {
+    response.status(400).send("Error Occured : " + err.message+ "\n");
+  }
+});
+
+AuthRouter.post("/logout", async (request, response) => {
+  try {
+    response.cookie("token",null,{
+        expires:new Date(Date.now())
+    }).send("logout successful");
   }
   catch (err) {
     response.status(400).send("Error Occured : " + err.message+ "\n");
