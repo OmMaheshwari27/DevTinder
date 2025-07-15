@@ -1,12 +1,15 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
+
 const User = require("./models/user");
 const { validateUserSignup, validateEmailOnly} = require("./utils/validation"); 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const {Auth}=require("./middlewares/auth");
+
+
 
 
 console.log("Trying to connect...");
@@ -20,11 +23,22 @@ connectDB()
   .catch((err) => {
     console.log("❌ DB error:", err);
   });
-
-// it will act as a middleware for all the api request where
-// the data coming in the form of JSON will be convert to JavaScript Object  
+  // it will act as a middleware for all the api request where
+  // the data coming in the form of JSON will be convert to JavaScript Object  
 app.use(express.json());
 app.use(cookieParser());
+
+
+
+const AuthRouter=require("./routers/auth");
+const ProfileRouter=require("./routers/profile");
+const RequestRouter=require("./routers/request");
+
+app.use("/",AuthRouter);
+app.use("/",ProfileRouter);
+app.use("/",RequestRouter);
+
+  
 
 // data coming in from request sent to the server
 app.post("/signup", async (request, response) => {
@@ -89,7 +103,7 @@ app.post("/login", async (request, response) => {
 });
 
 //accessing the profile by verifying the jwt token
-app.get("/profile", Auth, async (request,response)=>{
+app.get("/profile", Auth, async (request,response,)=>{
   try{
       const user_Data=request.user;
       response.send(user_Data);

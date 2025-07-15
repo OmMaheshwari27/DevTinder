@@ -1,74 +1,103 @@
 const express= require("express");
 const app = express();
-const { adminauth, userauth } = require("./middlewares/auth");
+const connectDB = require("./config/database");
+
+const User = require("./models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 
-// app.get("/test",(req,res)=>{
-//     res.send("i am test level");
-// });
 
-// app.get("/welcome",(req,res)=>{
-//     res.send("i am at welcome");
-// });
-
-// app.get("/bye",(req,res)=>{
-//     res.send("i am at exit level");
-// });
-
-// app.use("/bye",(req,res)=>{
-//     // if nothing is sent back as response then it will case an infinite loop and later it will timed out.
-// });
-
-// app.post("/test",(req,res)=>{
-//     console.log("post request here")
-//     res.send("post request successfully done");
-// })
-
-// app.post("/welcome",(req,res)=>{
-//     console.log("post request here")
-//     res.send("post request successfully done");
-// })
-
-// app.post("/bye",(req,res)=>{
-//     console.log("post request here")
-//     res.send("post request successfully done");
-// })
+console.log("Trying to connect...");
+connectDB()
+  .then(() => {
+    console.log("✅ connected successfully....");
+    app.listen(3001, () => {
+      console.log("🚀 server is running successfully on port 3001");
+    });
+  })
+  .catch((err) => {
+    console.log("❌ DB error:", err);
+  });
+  // it will act as a middleware for all the api request where
+  // the data coming in the form of JSON will be convert to JavaScript Object  
+app.use(express.json());
+app.use(cookieParser());
 
 
-// one route can have multiple route handler
-// it has a third paramter called next which is called inside the first route handler and then 2nd one will response
-// but this undesirable
-// this is basically known as chain of middleware(handler) until the actual handler is not met
-app.use("/bye",(req,res,next)=>{
-    console.log("1st post request here")
-    next();
-    res.send("post 1st request successfully done");
-},(req,res)=>{
-        console.log("2nd post request here")
-    res.send("post 2nd request successfully done");
-},(req,res)=>{
-        console.log("3nd post request here")
-    res.send("post 3nd request successfully done");
-},
-(req,res)=>{
-        console.log("4th post request here")
-    res.send("post 4th request successfully done");
-}
-)
+
+const AuthRouter=require("./routers/auth");
+const ProfileRouter=require("./routers/profile");
+const RequestRouter=require("./routers/request");
+
+app.use("/",AuthRouter);
+app.use("/",ProfileRouter);
+app.use("/",RequestRouter);
+
+  
 
 
 
 
 
 
+//get all the user from the database
+app.get("/feed", async (request, response) => {
+  // specific target data object
+  const Name = request.body.firstName;
+  try {
+    const userData = await User.find({ firstName: Name });
 
+    if (userData.length == 0) {
+      response.status(404).send("user not found");
+    }
+    else {
+      response.send(userData);
+      response.send("user found successfully");
+    }
 
+  }
+  catch (err) {
+    response.status(400).send("user not found/something went wrong" + err.message);
+  }
+})
 
-// this one is the wild card for any route as handle is empty
-// app.use("/",(req,res)=>{
-//     res.send("i am server");
-// });
-app.listen(3000,()=>{
-console.log("server is listen succesfully on port 3000");
-
+//delete request
+app.delete("/delete", async (request,response)=>{
+  // user to be deleted on request
+  const byname=request.body.firstName;
+  try{
+    const deleteduser= await User.deleteOne({firstName:byname});
+    if(deleteduser.deletedCount!=0){
+      response.send("deleted user was\n");
+    }
+    else{
+      response.status(404).send("user not found");
+    }
+  }
+  catch(err){
+      response.status(400).send("user not found/something went wrong " + err.message);
+  }
 });
+// update partial data
+app.patch("/update", async (request, response) => {
+  const { firstName, ...updateFields } = request.body;
+
+  try {
+    const result = await User.updateOne(
+      { firstName: firstName },   // filter
+      { $set: updateFields }      // update only provided fields
+    );
+
+    if (result.matchedCount === 0) {
+      return response.status(404).send("❌ User not found.");
+    }
+
+    return response.send("✅ User updated successfully.");
+  } catch (err) {
+    return response.status(400).send("❌ Update failed: " + err.message);
+  }
+});
+
+
