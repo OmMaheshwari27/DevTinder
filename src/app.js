@@ -30,10 +30,12 @@ app.use(cookieParser());
 const AuthRouter=require("./routers/auth");
 const ProfileRouter=require("./routers/profile");
 const RequestRouter=require("./routers/request");
+const UserRouter=require("./routers/user");
 
 app.use("/",AuthRouter);
 app.use("/",ProfileRouter);
 app.use("/",RequestRouter);
+app.use("/",UserRouter);
 
   
 
