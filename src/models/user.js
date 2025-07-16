@@ -35,6 +35,10 @@ const userSchema = mongoose.Schema({
                 throw new Error(`${value} is not a valid gender`);
             }
         }
+    //     enum: {
+    //     values:["interested", "ignored", "accepted", "pending"],
+    //     message:`{VALUE} is incorret status type`
+    // },
     },
     age: {
         type: Number,
@@ -67,6 +71,8 @@ const userSchema = mongoose.Schema({
     timestamps: true,
 }
 );
+
+userSchema.index({firstName:1,lastName:1});
 // basically User named class is defined in DB
 const User = mongoose.model("User", userSchema)
 
