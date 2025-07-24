@@ -26,26 +26,26 @@ const User = require("../models/user");
 // verifying and validation the actual token with help of jwt.JsonWebToken
 const Auth = async (request, response, next) => {
     try {
-        const cookie = request.cookies;
-        const { token } = cookie;
+        const { token } = request.cookies;
+
         if (!token) {
-            throw new Error("Token not found");
+            return response.status(401).send("please login");
         }
+
         const userObject = await jwt.verify(token, "Xoq66937");
         const id = userObject._id;
         const user = await User.findById({ _id: id });
+
         if (!user) {
-            throw new Error("user not found");
+            return response.status(404).send("User not found");
         }
-        else{
-            request.user=user;
-            next();
-        }
-    }
-    catch(err){
-        response.status(400).send("Error : "+err.message);
-    }
+
+        request.user = user;
+        next(); // ✅ Only called if all above passes
+    } catch (err) {
+        return response.status(400).send("Error: " + err.message); 
 }
+};
 
 module.exports = {
     Auth

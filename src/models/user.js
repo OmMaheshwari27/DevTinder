@@ -16,18 +16,17 @@ const userSchema = mongoose.Schema({
     email: {
         type: String,
         lowercase: true,
-        required:true,
+        required: true,
         trim: true,
         unique: true,
         validate(value) {
             if (!validator.isEmail(value)) {
-                throw new error("Invalid Email Address");
+                throw new Error("Invalid Email Address");
             }
         }
     },
     gender: {
         type: String,
-        //required: true,
         trim: true,
         validate(value) {
             const allowedGenders = ['male', 'female', 'other'];
@@ -35,24 +34,17 @@ const userSchema = mongoose.Schema({
                 throw new Error(`${value} is not a valid gender`);
             }
         }
-    //     enum: {
-    //     values:["interested", "ignored", "accepted", "pending"],
-    //     message:`{VALUE} is incorret status type`
-    // },
     },
     age: {
         type: Number,
-        //required:true,
         min: 13,
     },
     contactInfo: {
         type: String,
-       // required: true,
         trim: true,
         validate(value) {
-            const validator = require("validator");
             if (!validator.isMobilePhone(value, 'any')) {
-                throw new Error("Invalid contact number\n");
+                throw new Error("Invalid contact number");
             }
         }
     },
@@ -63,17 +55,44 @@ const userSchema = mongoose.Schema({
         max: 20,
         validate(value) {
             if (!validator.isStrongPassword(value)) {
-                throw new error("Password too weak\n");
+                throw new Error("Password too weak");
             }
         }
+    },
+    photoUrl: {
+        type: String,
+        trim: true,
+        validate(value) {
+            if (value && !validator.isURL(value)) {
+                throw new Error("Invalid photo URL");
+            }
+        }
+    },
+
+    about: {
+        type: String,
+        trim: true,
+        maxLength: 500,
+        default: ""
+    },
+
+    skills: {
+    type: [String],
+    default: [],
+    validate: {
+        validator: function (value) {
+            return Array.isArray(value) && value.length <= 10;
+        },
+        message: "You can add up to 10 skills only"
     }
+}
+
 }, {
     timestamps: true,
-}
-);
+});
 
-userSchema.index({firstName:1,lastName:1});
-// basically User named class is defined in DB
-const User = mongoose.model("User", userSchema)
+userSchema.index({ firstName: 1, lastName: 1 });
+
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

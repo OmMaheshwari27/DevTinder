@@ -1,8 +1,9 @@
 const express = require("express");
 const RequestRouter = express.Router();
 const { Auth } = require("../middlewares/auth");
-const ConnectionRequest = require("../models/connectRequests");
+const ConnectionRequests = require("../models/connectRequests");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, response) => {
     try {
@@ -15,7 +16,7 @@ RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, resp
             throw new Error("Bad request! status not matched");
         }
 
-        const existingConnection = await ConnectionRequest.findOne({
+        const existingConnection = await ConnectionRequests.findOne({
             $or: [
                 { fromUserId, toUserId },
                 { fromUserId: toUserId, toUserId: fromUserId },
@@ -31,7 +32,7 @@ RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, resp
         }
 
 
-        const newRequest = new ConnectionRequest({
+        const newRequest = new ConnectionRequests({
             fromUserId,
             toUserId,
             status,
@@ -50,10 +51,12 @@ RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, resp
         });
     }
 });
-RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, response) => {
+
+
+RequestRouter.post("/request/recieved/:status/:requestedId", Auth, async (request, response) => {
     try {
         const loggedInUser = request.user._id;
-        const requested = request.params.toUserId;
+        const requested = request.params.requestedId;
         const status = request.params.status;
 
         const allowStatus = ["accepted", "rejected"];
@@ -61,24 +64,25 @@ RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, resp
             throw new Error("Bad request! status not matched");
         }
 
-        const foundRequest = await ConnectionRequest.findOne(
-            {
-                _id:requested,
-                toUserId:loggedInUser,
-                status:"interested",
-            });
+        const foundRequest = await ConnectionRequests.findOne({
+            fromUserId: requested,           // 🛠️ Fixed this line
+            toUserId: loggedInUser,
+            status: "interested",
+        });
+
         if (!foundRequest) {
-            throw new Error("user not found");
+            throw new Error("request not found");
         }
 
-       foundRequest.status=status;
+        foundRequest.status = status;
 
         const data = await foundRequest.save();
 
         response.json({
             data,
-            message: "Connection request "+status+"by you!",
+            message: `Connection request ${status} by you!`,
         });
+
     } catch (err) {
         response.status(400).json({
             error: err.message,
@@ -86,6 +90,5 @@ RequestRouter.post("/request/send/:status/:toUserId", Auth, async (request, resp
         });
     }
 });
-
 
 module.exports = RequestRouter;

@@ -1,4 +1,5 @@
 const express= require("express");
+const cors = require('cors');
 const app = express();
 const connectDB = require("./config/database");
 
@@ -22,8 +23,23 @@ connectDB()
   });
   // it will act as a middleware for all the api request where
   // the data coming in the form of JSON will be convert to JavaScript Object  
-app.use(express.json());
+// Only apply JSON parsing for routes that need it (not GET)
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    express.json()(req, res, next);
+  } else {
+    next();
+  }
+});
+
 app.use(cookieParser());
+app.use(cors(
+  {
+    origin:"http://localhost:5173",
+    credentials:true,
+  }
+  
+));
 
 
 

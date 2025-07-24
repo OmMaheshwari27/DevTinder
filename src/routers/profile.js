@@ -8,14 +8,15 @@ const { isStrongPassword } = require("validator");
 //accessing the profile by verifying the jwt token
 ProfileRouter.get("/profile/view", Auth, async (request, response,) => {
     try {
+        //get the user data from the request
         const user_Data = request.user;
-        console.log(user_Data);
+        //console.log(user_Data);
 
         response.send(user_Data);
 
     }
     catch (err) {
-        response.status(400).send("Error Occured : " + err.message + "\n");
+        response.status(400).send("Error Occured : " + err.message);
     };
 });
 
@@ -25,9 +26,9 @@ ProfileRouter.patch("/profile/edit", Auth, async (request, response) => {
             throw new Error("Edit not allowed");
         }
         const loggedInUser = request.user;
-        console.log(loggedInUser);
+        //console.log(loggedInUser);
         Object.keys(request.body).forEach((key) => (loggedInUser[key] = request.body[key]));
-        console.log(loggedInUser);
+        //console.log(loggedInUser);
         await loggedInUser.save();
         response.send(`${loggedInUser.firstName}'s profile updated successfully`);
 

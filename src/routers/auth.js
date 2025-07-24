@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { validateUserSignup, validateEmailOnly} = require("../utils/validation");
 const User = require("../models/user");
-//const { Auth } = require("../middlewares/auth");
+
 
 
 
@@ -19,9 +19,9 @@ AuthRouter.post("/signup", async (request, response) => {
     // validation of data
     validateUserSignup(request);
     //encryption of password with salt rounds
-    const {firstName,lastName,email,gender,contactInfo,password}=request.body;
+    const {firstName,lastName,email,gender,contactInfo,password,photoUrl,about,skills}=request.body;
     const passHash= await bcrypt.hash(password,10);
-    console.log(passHash);
+    //console.log(passHash);
     //new user object
     const data1 = new User({
       firstName,
@@ -30,13 +30,23 @@ AuthRouter.post("/signup", async (request, response) => {
       gender,
       contactInfo,
       password:passHash,
+      photoUrl,
+      about,
+      skills,
     });
     //dating being saved
-    await data1.save();
-    response.send("db updated");
+    const savedUser= await data1.save();
+    const token= await jwt.sign({_id:savedUser._id},"Xoq66937",{expiresIn:"1d"}); //expires in 1 day
+      //console.log(token);
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      response.cookie("token",token,{expires:expiresAt}); 
+
+
+
+    response.json({message: "sign up successful ",data:savedUser});
   }
   catch (err) {
-    response.status(400).send("error occured" + err.message);
+    response.status(400).send("error occured " + err.message);
   }
 });
 
@@ -58,11 +68,11 @@ AuthRouter.post("/login", async (request, response) => {
     const password_bool=await bcrypt.compare(password,userObject.password);
     if(password_bool){
     //creating cookie containing jwt token  which will be sent back to cleint browser
-      const token=await jwt.sign({_id:userObject._id},"Xoq66937",{expiresIn:"1h"}); //expires in 1 hour
-      console.log(token);
+      const token=await jwt.sign({_id:userObject._id},"Xoq66937",{expiresIn:"1d"}); //expires in 1 day
+      //console.log(token);
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       response.cookie("token",token,{expires:expiresAt}); 
-      response.send("Login Successfully\n");
+      response.send(userObject);
     }
     else{
       throw new Error("Invalid Credentials\n");
