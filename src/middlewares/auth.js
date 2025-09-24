@@ -41,7 +41,7 @@ const Auth = async (request, response, next) => {
         }
 
         request.user = user;
-        next(); // ✅ Only called if all above passes
+        next(); //Only called if all above passes
     } catch (err) {
         return response.status(400).send("Error: " + err.message); 
 }
