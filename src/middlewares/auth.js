@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+require("dotenv").config({ path: __dirname + "/../../.env" }); 
 
 // dummy auths were made in initial days
 // const adminauth=(req,res,next)=>{
@@ -32,7 +33,7 @@ const Auth = async (request, response, next) => {
             return response.status(401).send("please login");
         }
 
-        const userObject = await jwt.verify(token, "Xoq66937");
+        const userObject = await jwt.verify(token, process.env.JWT_SECRET);
         const id = userObject._id;
         const user = await User.findById({ _id: id });
 
@@ -41,7 +42,7 @@ const Auth = async (request, response, next) => {
         }
 
         request.user = user;
-        next(); //Only called if all above passes
+        next(); //  Only called if all above passes
     } catch (err) {
         return response.status(400).send("Error: " + err.message); 
 }

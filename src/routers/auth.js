@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { validateUserSignup, validateEmailOnly} = require("../utils/validation");
 const User = require("../models/user");
+require("dotenv").config({ path: __dirname + "/../../.env" }); 
 
 
 
@@ -36,7 +37,7 @@ AuthRouter.post("/signup", async (request, response) => {
     });
     //dating being saved
     const savedUser= await data1.save();
-    const token= await jwt.sign({_id:savedUser._id},"Xoq66937",{expiresIn:"1d"}); //expires in 1 day
+    const token= await jwt.sign({_id:savedUser._id},process.env.JWT_SECRET,{expiresIn:"1d"}); //expires in 1 day
       //console.log(token);
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       response.cookie("token",token,{expires:expiresAt}); 
@@ -68,7 +69,7 @@ AuthRouter.post("/login", async (request, response) => {
     const password_bool=await bcrypt.compare(password,userObject.password);
     if(password_bool){
     //creating cookie containing jwt token  which will be sent back to cleint browser
-      const token=await jwt.sign({_id:userObject._id},"Xoq66937",{expiresIn:"1d"}); //expires in 1 day
+      const token=await jwt.sign({_id:userObject._id},process.env.JWT_SECRET,{expiresIn:"1d"}); //expires in 1 day
       //console.log(token);
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       response.cookie("token",token,{expires:expiresAt}); 
