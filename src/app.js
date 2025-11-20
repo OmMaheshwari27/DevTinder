@@ -63,62 +63,62 @@ app.use("/",UserRouter);
 
 
 
-//get all the user from the database
-app.get("/feed", async (request, response) => {
-  // specific target data object
-  const Name = request.body.firstName;
-  try {
-    const userData = await User.find({ firstName: Name });
+// //get all the user from the database
+// app.get("/feed", async (request, response) => {
+//   // specific target data object
+//   const Name = request.body.firstName;
+//   try {
+//     const userData = await User.find({ firstName: Name });
 
-    if (userData.length == 0) {
-      response.status(404).send("user not found");
-    }
-    else {
-      response.send(userData);
-      response.send("user found successfully");
-    }
+//     if (userData.length == 0) {
+//       response.status(404).send("user not found");
+//     }
+//     else {
+//       response.send(userData);
+//       response.send("user found successfully");
+//     }
 
-  }
-  catch (err) {
-    response.status(400).send("user not found/something went wrong" + err.message);
-  }
-})
+//   }
+//   catch (err) {
+//     response.status(400).send("user not found/something went wrong" + err.message);
+//   }
+// })
 
-//delete request
-app.delete("/delete", async (request,response)=>{
-  // user to be deleted on request
-  const byname=request.body.firstName;
-  try{
-    const deleteduser= await User.deleteOne({firstName:byname});
-    if(deleteduser.deletedCount!=0){
-      response.send("deleted user was\n");
-    }
-    else{
-      response.status(404).send("user not found");
-    }
-  }
-  catch(err){
-      response.status(400).send("user not found/something went wrong " + err.message);
-  }
-});
-// update partial data
-app.patch("/update", async (request, response) => {
-  const { firstName, ...updateFields } = request.body;
+// //delete request
+// app.delete("/delete", async (request,response)=>{
+//   // user to be deleted on request
+//   const byname=request.body.firstName;
+//   try{
+//     const deleteduser= await User.deleteOne({firstName:byname});
+//     if(deleteduser.deletedCount!=0){
+//       response.send("deleted user was\n");
+//     }
+//     else{
+//       response.status(404).send("user not found");
+//     }
+//   }
+//   catch(err){
+//       response.status(400).send("user not found/something went wrong " + err.message);
+//   }
+// });
+// // update partial data
+// app.patch("/update", async (request, response) => {
+//   const { firstName, ...updateFields } = request.body;
 
-  try {
-    const result = await User.updateOne(
-      { firstName: firstName },   // filter
-      { $set: updateFields }      // update only provided fields
-    );
+//   try {
+//     const result = await User.updateOne(
+//       { firstName: firstName },   // filter
+//       { $set: updateFields }      // update only provided fields
+//     );
 
-    if (result.matchedCount === 0) {
-      return response.status(404).send("❌ User not found.");
-    }
+//     if (result.matchedCount === 0) {
+//       return response.status(404).send("❌ User not found.");
+//     }
 
-    return response.send("✅ User updated successfully.");
-  } catch (err) {
-    return response.status(400).send("❌ Update failed: " + err.message);
-  }
-});
+//     return response.send("✅ User updated successfully.");
+//   } catch (err) {
+//     return response.status(400).send("❌ Update failed: " + err.message);
+//   }
+// });
 
 
