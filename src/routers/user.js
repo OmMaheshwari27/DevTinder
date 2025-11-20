@@ -9,7 +9,7 @@ const user_safe_Data = "firstName lastName age gender photoUrl skills about";
 
 
 
-UserRouter.get("/user/requests/recieved", Auth, async (request, response) => {
+UserRouter.get("requests/recieved", Auth, async (request, response) => {
     try {
         const loggedInUser = request.user;
         // get all the request loggedIn user has recieved
@@ -37,7 +37,7 @@ UserRouter.get("/user/requests/recieved", Auth, async (request, response) => {
     }
 });
 
-UserRouter.get("/user/connections", Auth, async (request, response) => {
+UserRouter.get("connections", Auth, async (request, response) => {
     try {
         const loggedInUser = request.user;
         const Connections = await ConnectionRequests.find(

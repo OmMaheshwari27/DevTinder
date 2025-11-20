@@ -32,7 +32,6 @@ const Auth = async (request, response, next) => {
         if (!token) {
             return response.status(401).send("please login");
         }
-
         const userObject = await jwt.verify(token, process.env.JWT_SECRET);
         const id = userObject._id;
         const user = await User.findById({ _id: id });
