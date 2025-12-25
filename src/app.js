@@ -1,4 +1,4 @@
-const express= require("express");
+const express = require("express");
 const cors = require('cors');
 const app = express();
 const connectDB = require("./config/database");
@@ -8,6 +8,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
+const { initializeSocket } = require("./utils/socket");
+const http = require("http");
+const server = http.createServer(app);
+initializeSocket(server);
 
 
 console.log("Trying to connect...");
@@ -15,15 +19,15 @@ connectDB()
   .then(() => {
     console.log("✅ connected successfully....");
     const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
   })
   .catch((err) => {
     console.log("❌ DB error:", err);
   });
-  // it will act as a middleware for all the api request where
-  // the data coming in the form of JSON will be convert to JavaScript Object  
+// it will act as a middleware for all the api request where
+// the data coming in the form of JSON will be convert to JavaScript Object  
 // Only apply JSON parsing for routes that need it (not GET)
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
@@ -46,17 +50,19 @@ app.use(cors({
 
 
 
-const AuthRouter=require("./routers/auth");
-const ProfileRouter=require("./routers/profile");
-const RequestRouter=require("./routers/request");
-const UserRouter=require("./routers/user");
+const AuthRouter = require("./routers/auth");
+const ProfileRouter = require("./routers/profile");
+const RequestRouter = require("./routers/request");
+const UserRouter = require("./routers/user");
+const ChatRouter = require("./routers/chat");
 
-app.use("/",AuthRouter);
-app.use("/",ProfileRouter);
-app.use("/",RequestRouter);
-app.use("/",UserRouter);
+app.use("/chat", ChatRouter);
+app.use("/", AuthRouter);
+app.use("/", ProfileRouter);
+app.use("/", RequestRouter);
+app.use("/", UserRouter);
 
-  
+
 
 
 

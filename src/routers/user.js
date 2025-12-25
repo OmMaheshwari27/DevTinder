@@ -48,7 +48,7 @@ UserRouter.get("/connections", Auth, async (request, response) => {
                 ]
             }
         ).populate("fromUserId", user_safe_Data).populate("toUserId", user_safe_Data);
-        console.log(Connections);
+        //console.log(Connections);
         
         const data = Connections.map((row) => {
             if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -77,7 +77,7 @@ UserRouter.get("/feed", Auth, async (request, response) => {
     
     try {
         const loggedInUser = request.user;
-        console.log(loggedInUser);
+        //console.log(loggedInUser);
         
         const ConnectionRequest = await ConnectionRequests.find({
             $or: [

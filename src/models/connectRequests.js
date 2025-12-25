@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const connectionRequestSchema = new mongoose.Schema({
+const connectionRequestSchema = new mongoose.Schema(
+  {
   fromUserId: {
     type: mongoose.Schema.Types.ObjectId,
     index:true,
@@ -21,7 +22,8 @@ const connectionRequestSchema = new mongoose.Schema({
     },
     required: true,
   }
-}, {
+}, 
+{
   timestamps: true
 });
 // Compound index: fromUserId + toUserId should be unique

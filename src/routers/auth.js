@@ -76,7 +76,7 @@ AuthRouter.post("/login", async (request, response) => {
       response.send(userObject);
     }
     else{
-      throw new Error("Invalid Credentials\n");
+      throw new Error("Invalid Credential\n");
     }
   }
   catch (err) {

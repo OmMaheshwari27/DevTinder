@@ -4,7 +4,24 @@ const { validateProfileData, validatePassword } = require("../utils/validation")
 const { Auth } = require("../middlewares/auth");
 const bcrypt = require("bcrypt");
 const { isStrongPassword } = require("validator");
+const User = require("../models/user");
 
+
+ProfileRouter.get("/profile/view/:id", Auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      "firstName lastName age gender photoUrl about skills"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ message: "Error: " + err.message });
+  }
+});
 //accessing the profile by verifying the jwt token
 ProfileRouter.get("/profile/view", Auth, async (request, response,) => {
     try {
